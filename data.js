@@ -2,7 +2,7 @@
 (function () {
   var now = Date.now();
   function daysAgo(n, h) { return new Date(now - n * 864e5 - (h || 0) * 36e5).toISOString(); }
-  function fav(d) { return "https://www.google.com/s2/favicons?domain=" + d + "&sz=128"; }
+  function fav(d) { return "https://icon.horse/icon/" + d; }
 
   window.RK_CATEGORIES = [
     "Leaderboards", "Marketing", "SEO", "Productivity", "Agents", "Developer",

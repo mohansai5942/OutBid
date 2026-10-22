@@ -122,36 +122,70 @@
     return "";
   }
 
-  function fetchMeta(target) {
-    if (!target || target.handle) return;
-    if (fetchFor === target.url) return;
-    fetchFor = target.url;
-    fetchedMeta = null;
-    $("urlIco").innerHTML = '<span class="spinner"></span>';
+  var metaPromise = null;
+
+  function microlinkMeta(target) {
     var ctrl = ("AbortController" in window) ? new AbortController() : null;
     var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 7000) : null;
-    fetch("https://api.microlink.io?url=" + encodeURIComponent(target.url), ctrl ? { signal: ctrl.signal } : {})
+    return fetch("https://api.microlink.io?url=" + encodeURIComponent(target.url), ctrl ? { signal: ctrl.signal } : {})
       .then(function (r) { return r.json(); })
       .then(function (j) {
         if (timer) clearTimeout(timer);
-        $("urlIco").textContent = "🌐";
-        if (j && j.data) {
-          fetchedMeta = {
-            title: j.data.title || "",
-            description: j.data.description || "",
-            logo: (j.data.logo && j.data.logo.url) || ""
-          };
-          var guessed = guessCategory(fetchedMeta.title + " " + fetchedMeta.description + " " + target.label);
-          if (guessed && !$("claimCategory").value) {
-            $("claimCategory").value = guessed;
-          }
-          updateHelper();
+        if (j && j.data && (j.data.title || j.data.description)) {
+          return { title: j.data.title || "", description: j.data.description || "", logo: (j.data.logo && j.data.logo.url) || "" };
         }
+        return null;
       })
-      .catch(function () {
+      .catch(function () { if (timer) clearTimeout(timer); return null; });
+  }
+
+  function proxyMeta(target) {
+    // Fallback: fetch the page through a public CORS proxy and read its own meta tags.
+    var ctrl = ("AbortController" in window) ? new AbortController() : null;
+    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 9000) : null;
+    return fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(target.url), ctrl ? { signal: ctrl.signal } : {})
+      .then(function (r) { return r.text(); })
+      .then(function (html) {
         if (timer) clearTimeout(timer);
-        $("urlIco").textContent = "🌐";
-      });
+        if (!html) return null;
+        var doc = new DOMParser().parseFromString(html, "text/html");
+        function metaVal(sel) { var el = doc.querySelector(sel); return el ? (el.getAttribute("content") || "").trim() : ""; }
+        var title = metaVal('meta[property="og:title"]') || (doc.querySelector("title") ? doc.querySelector("title").textContent.trim() : "");
+        var description = metaVal('meta[property="og:description"]') || metaVal('meta[name="description"]');
+        var logo = metaVal('meta[property="og:image"]');
+        if (!logo) {
+          var icon = doc.querySelector('link[rel="apple-touch-icon"], link[rel="icon"]');
+          if (icon && icon.getAttribute("href")) {
+            try { logo = new URL(icon.getAttribute("href"), target.url).href; } catch (e) { logo = ""; }
+          }
+        }
+        if (!title && !description) return null;
+        return { title: title, description: description, logo: logo };
+      })
+      .catch(function () { if (timer) clearTimeout(timer); return null; });
+  }
+
+  // Cached per-URL metadata promise — the claim modal awaits this, so the
+  // form is always filled from the completed fetch (no race).
+  function getMeta(target) {
+    if (!target || target.handle) return Promise.resolve(null);
+    if (fetchFor === target.url && metaPromise) return metaPromise;
+    fetchFor = target.url;
+    fetchedMeta = null;
+    $("urlIco").innerHTML = '<span class="spinner"></span>';
+    metaPromise = microlinkMeta(target).then(function (m) {
+      return m || proxyMeta(target);
+    }).then(function (m) {
+      $("urlIco").textContent = "🌐";
+      fetchedMeta = m;
+      if (m) {
+        var guessed = guessCategory(m.title + " " + m.description + " " + target.label);
+        if (guessed && !$("claimCategory").value) $("claimCategory").value = guessed;
+        updateHelper();
+      }
+      return m;
+    });
+    return metaPromise;
   }
 
   /* ---------- board rendering ---------- */
@@ -192,7 +226,7 @@
         $("bidAmount").value = b.getAttribute("data-amt");
         $("claimTarget").value = l.url.replace(/^https?:\/\//, "");
         $("claimCategory").value = l.category;
-        fetchFor = ""; fetchMeta(null);
+        fetchFor = ""; metaPromise = null; fetchedMeta = null;
         updateHelper();
         window.scrollTo({ top: 0, behavior: "smooth" });
       });
@@ -243,6 +277,25 @@
   }
 
   /* ---------- claim flow ---------- */
+  function fillClaimModal(meta) {
+    var pc = pendingClaim;
+    if (!pc) return;
+    var existing = pc.existingId ? listings.filter(function (l) { return l.id === pc.existingId; })[0] : null;
+    var name = existing ? existing.name : (meta && meta.title) || "";
+    var tagline = existing ? existing.tagline : (meta && meta.description) || "";
+    var logo = existing ? (existing.logo || "") : (meta && meta.logo) || "";
+    if (pc.handle) { name = "@" + pc.handle; logo = "https://unavatar.io/x/" + pc.handle; }
+    pc.logo = logo;
+    pc.desc = (meta && meta.description) || tagline;
+    $("fpLogo").innerHTML = R.logoHTML({ name: name || pc.label, logo: logo, url: pc.url }, 44);
+    $("fpName").textContent = name || pc.label;
+    $("fpTag").textContent = tagline || "Couldn't fetch details automatically — type them below.";
+    $("fName").value = name;
+    $("fTagline").value = tagline;
+    $("fName").disabled = false;
+    $("fTagline").disabled = false;
+  }
+
   function openClaim(ev) {
     ev.preventDefault();
     var target = normalizeTarget($("claimTarget").value);
@@ -256,25 +309,23 @@
     $("confirmCat").textContent = cat;
     $("confirmPrice").textContent = R.inr(amt);
     $("confirmDue").textContent = S.CONFIG.demoMode ? "Free during launch phase" : "Due now";
-
-    var meta = (fetchFor === target.url) ? fetchedMeta : null;
-    var name = existing ? existing.name : (meta && meta.title) ? meta.title : "";
-    var tagline = existing ? existing.tagline : (meta && meta.description) ? meta.description : "";
-    var logo = existing ? (existing.logo || "") : (meta && meta.logo) ? meta.logo : R.faviconFor(target.url);
-    if (target.handle) { name = "@" + target.handle; logo = "https://unavatar.io/x/" + target.handle; }
-
-    $("fpLogo").innerHTML = R.logoHTML({ name: name || target.label, logo: logo, url: target.url }, 44);
-    $("fpName").textContent = name || target.label;
-    $("fpTag").textContent = tagline || "Details fetched from your website — you can edit them below.";
-    $("fName").value = name;
-    $("fTagline").value = tagline;
     $("fEmail").value = existing ? (existing.email || "") : "";
     $("fTerms").checked = false;
     $("confirmBtn").disabled = true;
     $("formErr").hidden = true;
-    pendingClaim.logo = logo;
-    pendingClaim.desc = (meta && meta.description) || tagline;
+
+    // Open in a loading state — the fields fill when the fetch completes.
+    $("fpName").textContent = "Fetching details…";
+    $("fpTag").textContent = "Reading " + target.label + "'s public details (logo, title, description)";
+    $("fpLogo").innerHTML = '<span class="spinner"></span>';
+    $("fName").value = "";
+    $("fTagline").value = "";
+    $("fName").disabled = true;
+    $("fTagline").disabled = true;
     $("claimModal").hidden = false;
+
+    if (target.handle) { fillClaimModal(null); return; }
+    getMeta(target).then(fillClaimModal);
   }
 
   function submitClaim(ev) {
@@ -347,7 +398,7 @@
     $("claimTarget").addEventListener("input", function () {
       updateHelper();
       var t = normalizeTarget($("claimTarget").value);
-      if (t) fetchMeta(t);
+      if (t) getMeta(t);
     });
     $("claimCategory").addEventListener("change", updateHelper);
     $("claimFormTop").addEventListener("submit", openClaim);

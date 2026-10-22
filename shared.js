@@ -23,11 +23,36 @@
   function faviconFor(url) {
     return "https://www.google.com/s2/favicons?domain=" + encodeURIComponent(domainOf(url)) + "&sz=128";
   }
+  function iconHorseFor(url) {
+    return "https://icon.horse/icon/" + encodeURIComponent(domainOf(url));
+  }
+  // Original-logo cascade: the site's own logo/icon first (stored logo, then
+  // icon.horse which serves the site's best apple-touch-icon/logo), then the
+  // Google favicon, then a letter tile. Each step fires on image error.
+  function logoSources(l) {
+    var out = [];
+    function add(u) { if (u && out.indexOf(u) < 0) out.push(u); }
+    add(l.logo);
+    add(iconHorseFor(l.url));
+    add(faviconFor(l.url));
+    return out;
+  }
+  window.RKLogoStep = function (img) {
+    var list = (img.getAttribute("data-fb") || "").split("|").filter(Boolean);
+    var idx = parseInt(img.getAttribute("data-fbi") || "0", 10) + 1;
+    if (idx < list.length) {
+      img.setAttribute("data-fbi", String(idx));
+      img.src = list[idx];
+    } else {
+      img.style.display = "none";
+      if (img.nextElementSibling) img.nextElementSibling.style.display = "flex";
+    }
+  };
   function logoHTML(l, size) {
-    var src = l.logo || faviconFor(l.url);
+    var srcs = logoSources(l);
     var letter = esc((l.name || "?").trim().charAt(0).toUpperCase() || "?");
     return '<span class="logo-box" style="width:' + size + "px;height:" + size + 'px">' +
-      '<img src="' + esc(src) + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
+      '<img src="' + esc(srcs[0]) + '" data-fb="' + esc(srcs.join("|")) + '" data-fbi="0" alt="" loading="lazy" onerror="RKLogoStep(this)">' +
       '<span class="logo-letter" style="display:none">' + letter + "</span></span>";
   }
   function qs(name) {
@@ -48,5 +73,5 @@
   }
   document.addEventListener("DOMContentLoaded", initLivePill);
 
-  window.RK = { esc: esc, inr: inr, ago: ago, domainOf: domainOf, faviconFor: faviconFor, logoHTML: logoHTML, qs: qs };
+  window.RK = { esc: esc, inr: inr, ago: ago, domainOf: domainOf, faviconFor: faviconFor, iconHorseFor: iconHorseFor, logoSources: logoSources, logoHTML: logoHTML, qs: qs };
 })();

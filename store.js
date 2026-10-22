@@ -2,8 +2,8 @@
 // MVP: localStorage. Production swap: replace load/save with Firestore calls
 // (same listing shape) — see README.md.
 (function () {
-  var KEY = "outbid_listings_v2";
-  var EVENTS_KEY = "outbid_events_v2";
+  var KEY = "outbid_listings_v3";
+  var EVENTS_KEY = "outbid_events_v3";
   var VISITORS_KEY = "outbid_visitors_v2";
 
   var CONFIG = {
