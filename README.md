@@ -5,7 +5,7 @@ product URL or X @handle, set a bid, and **your rank is what you bid**.
 A [BrandiQue Web Solutions](https://brandique.in) product.
 Inspired by [outbid.lol](https://outbid.lol).
 
-**Planned home:** rank.brandique.in · **Theme:** BrandiQue yellow `#EAB308` on black
+**Repo:** github.com/mohansai5942/OutBid · **Planned home:** rank.brandique.in · **Theme:** BrandiQue yellow `#EAB308` on black
 
 ## What's built (MVP)
 
