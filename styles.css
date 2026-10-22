@@ -94,6 +94,7 @@ input:focus,select:focus{outline:2px solid var(--yellow);outline-offset:0;border
 .btn-cta:hover{background:var(--yellow-soft)}
 
 .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal-backdrop[hidden]{display:none}
 .modal{background:var(--panel);border:1px solid var(--line);border-radius:18px;max-width:480px;width:100%;padding:28px;position:relative;max-height:92vh;overflow:auto}
 .modal h3{margin-bottom:6px;font-size:21px}
 .modal-rank{color:var(--yellow-soft);font-size:14.5px;margin-bottom:16px}
