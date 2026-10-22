@@ -7,23 +7,32 @@ Inspired by [outbid.lol](https://outbid.lol).
 
 **Repo:** github.com/mohansai5942/OutBid · **Planned home:** rank.brandique.in · **Theme:** BrandiQue yellow `#EAB308` on black
 
-## What's built (MVP)
+## What's built (v2 — modelled on the reference board's behaviour)
 
-- `index.html` — public board: All-time + Today boards, category tabs, search,
-  live stats (products / total bid value / clicks delivered), claim widget with
-  amount stepper, How-it-works, FAQ, lead-gen footer.
-- Claim flow — URL or @handle → details form (name, tagline, **email = lead
-  capture**) → listing goes live at the rank its bid buys. Re-submitting the
-  same URL tops up instead of duplicating (www- and protocol-insensitive match).
+- `index.html` — public board in the reference layout: header with live pill,
+  category pill bar, All-time / Today tabs, "Claim #1 for ₹X" headline stepper,
+  two-column board + sidebar (**Today's ranking** + **Latest activity** feed),
+  stats block, How-it-works, FAQ, lead-gen footer.
+- **Auto-fetch** — entering a product URL fetches its public metadata
+  (Microlink: title, description, logo) and auto-guesses the category; the
+  listing shows the fetched logo everywhere. @handles supported too.
+- Claim flow — URL + category + amount → **Confirm-this-rank modal** (rank /
+  price card, fetched preview, name/tagline pre-filled & editable, **email =
+  lead capture**, Terms checkbox) → listing live at its rank. Re-submitting
+  the same URL tops up instead of duplicating (www-insensitive match).
 - Ranking rules — rank = bid amount (high → low), ties go to the earlier
-  listing; minimum bid ₹99; taking a rank costs ₹50 above its holder.
-  All knobs live in `store.js` → `CONFIG`.
+  listing; minimum bid ₹99; taking a rank costs ₹50 above its holder, ₹250
+  above #1. All knobs live in `store.js` → `CONFIG`.
+- `product.html` — per-product page: big logo card, Visit / Copy link,
+  category & overall rank cards, "About this ranking", also-in-category.
+- `daily.html` — today's live board + past-day boards. `categories.html` —
+  category grid with claim counts and current #1s. `search.html` — results.
 - `admin.html` — moderation (hide/unhide/delete, reset demo data) + **leads
   table with CSV download** (every claim's email — the BrandiQue lead funnel).
   Demo gate password: `brandique` — placeholder only, replace before launch.
-- `rules.html` — public listing rules page.
-- Seed data (`data.js`) — 8 real BrandiQue projects, so the board never opens
-  empty.
+- `rules.html` / `terms.html` / `privacy.html` — public policy pages.
+- Seed data (`data.js`) — 8 real BrandiQue projects with logos & descriptions,
+  so the board never opens empty.
 
 ## Launch-phase mode
 

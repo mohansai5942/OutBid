@@ -63,7 +63,8 @@
     $("gatePass").addEventListener("keydown", function (e) { if (e.key === "Enter") unlock(); });
     $("resetBtn").addEventListener("click", function () {
       if (!confirm("Reset all data back to the seed listings?")) return;
-      localStorage.removeItem("outbid_listings_v1");
+      localStorage.removeItem(S.KEY);
+      localStorage.removeItem(S.EVENTS_KEY);
       S.load(); render();
     });
     $("csvBtn").addEventListener("click", function () {
