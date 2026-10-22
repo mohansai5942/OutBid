@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OutBid Admin — Moderation & Leads</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap header-in">
+    <a class="logo" href="index.html">Out<span>Bid</span></a>
+    <nav class="main-nav"><a href="index.html">← Back to board</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="gate" id="gate">
+    <h2>Admin access</h2>
+    <p style="color:var(--muted);font-size:14px">Demo password: <code>brandique</code> (replace with real auth before launch — see README)</p>
+    <input id="gatePass" type="password" placeholder="Password">
+    <button class="btn-claim btn-wide" id="gateBtn" type="button">Enter</button>
+    <p class="form-err" id="gateErr" hidden>Wrong password.</p>
+  </div>
+
+  <div id="adminPanel" hidden>
+    <div class="admin-head">
+      <h2>Listings moderation</h2>
+      <button class="btn-mini" id="resetBtn" type="button">Reset demo data</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="admin-table" id="listingsTable">
+        <thead><tr><th>#</th><th>Product</th><th>Category</th><th>Bid</th><th>Clicks</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <h2 class="admin-section">Leads — everyone who claimed a rank</h2>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:12px">Every lister is a product owner — a warm lead for BrandiQue's web / AI services.</p>
+    <div style="overflow-x:auto">
+      <table class="admin-table" id="leadsTable">
+        <thead><tr><th>Product</th><th>Email</th><th>Bid</th><th>Claimed</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p style="margin-top:14px"><button class="btn-mini" id="csvBtn" type="button">Download leads CSV</button></p>
+  </div>
+</main>
+
+<script src="data.js"></script>
+<script src="store.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

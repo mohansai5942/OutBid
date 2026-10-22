@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OutBid — India's Product Launch Board | Rank = What You Bid</title>
+<meta name="description" content="Launch your product on India's bid-based leaderboard. Claim a rank, get discovered, get customers. A BrandiQue Web Solutions product.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="launch-banner" id="launchBanner">
+  🚀 <strong>Launch phase:</strong> claims are <strong>FREE</strong> right now — your bid amount reserves your rank. Paid bidding opens soon.
+</div>
+
+<header class="site-header">
+  <div class="wrap header-in">
+    <a class="logo" href="index.html">Out<span>Bid</span></a>
+    <nav class="main-nav">
+      <a href="#board">Leaderboard</a>
+      <a href="#how">How it works</a>
+      <a href="#faq">FAQ</a>
+      <a href="admin.html" class="nav-admin">Admin</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero wrap">
+  <h1>Claim a rank on the public leaderboard</h1>
+  <p class="hero-sub">India's launch board for products &amp; startups. No votes, no waiting lines — <strong>your rank is what you bid.</strong> Higher bid, higher spot, more eyeballs.</p>
+
+  <div class="stats-strip" id="statsStrip">
+    <div class="stat"><span class="stat-num" id="statProducts">–</span><span class="stat-label">products listed</span></div>
+    <div class="stat"><span class="stat-num" id="statBids">–</span><span class="stat-label">total bid value</span></div>
+    <div class="stat"><span class="stat-num" id="statClicks">–</span><span class="stat-label">clicks delivered</span></div>
+  </div>
+
+  <div class="claim-widget" id="claim">
+    <div class="claim-row">
+      <div class="amount-box">
+        <label for="bidAmount">Claim #1 for</label>
+        <div class="amount-stepper">
+          <button type="button" id="amtMinus" aria-label="Decrease amount">−</button>
+          <span class="amount-val">₹<input id="bidAmount" type="number" min="99" step="50" value="5099"></span>
+          <button type="button" id="amtPlus" aria-label="Increase amount">+</button>
+        </div>
+      </div>
+      <div class="claim-fields">
+        <input id="claimTarget" type="text" placeholder="Your product URL or @handle — e.g. myproduct.in">
+        <select id="claimCategory" aria-label="Category"></select>
+      </div>
+      <button class="btn-claim" id="claimBtn" type="button">Claim rank →</button>
+    </div>
+    <p class="claim-note" id="claimNote">Minimum bid ₹99 · Taking a rank costs ₹50 more than the listing holding it · Launch phase: free to claim</p>
+  </div>
+</section>
+
+<main class="wrap" id="board">
+  <div class="board-head">
+    <div class="board-tabs" role="tablist">
+      <button class="tab active" data-board="alltime" type="button">All-time</button>
+      <button class="tab" data-board="today" type="button">Today</button>
+    </div>
+    <input id="searchBox" type="search" placeholder="Search products…">
+  </div>
+  <div class="cat-tabs" id="catTabs"></div>
+  <div class="board-list" id="boardList"></div>
+  <p class="board-empty" id="boardEmpty" hidden>No products here yet — be the first to claim a rank.</p>
+</main>
+
+<section class="wrap how" id="how">
+  <h2>How it works</h2>
+  <div class="how-grid">
+    <div class="how-card"><span class="how-num">1</span><h3>Claim</h3><p>Paste your product URL or @handle, pick a category, set your bid. During launch phase, claiming is free — the bid reserves your rank.</p></div>
+    <div class="how-card"><span class="how-num">2</span><h3>Rank</h3><p>Your product appears on the board at the rank your bid buys. Anyone can outbid you — and you can top up anytime to climb back.</p></div>
+    <div class="how-card"><span class="how-num">3</span><h3>Get discovered</h3><p>Visitors browse the board daily. Every listing shows its click count, so you can see the eyeballs your rank delivers.</p></div>
+  </div>
+</section>
+
+<section class="wrap faq" id="faq">
+  <h2>FAQ</h2>
+  <details><summary>What can I list?</summary><p>Product websites and X (Twitter) @handles — SaaS, apps, tools, startups, agencies. No chat/invite links, no NSFW, no affiliate or tracking links.</p></details>
+  <details><summary>How does ranking work exactly?</summary><p>Rank is purely your bid amount, highest first. Ties go to the earlier listing. To take a rank, bid ₹50 more than the listing currently holding it.</p></details>
+  <details><summary>Is it really free right now?</summary><p>Yes — during the launch phase, claims cost nothing and your bid amount reserves your rank. When paid bidding opens, you'll only pay the difference to keep your spot.</p></details>
+  <details><summary>Can I raise my rank later?</summary><p>Yes. Resubmit the same URL or handle with a higher bid — you only pay the difference.</p></details>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap footer-in">
+    <div>
+      <a class="logo" href="index.html">Out<span>Bid</span></a>
+      <p class="footer-by">A <a href="https://brandique.in" target="_blank" rel="noopener">BrandiQue Web Solutions</a> product · Visakhapatnam, India<br>
+      Inspired by <a href="https://outbid.lol" target="_blank" rel="noopener">outbid.lol</a> · <a href="rules.html">Listing rules</a></p>
+    </div>
+    <div class="footer-cta">
+      <p>Need a website, AI agent or automation for your product?</p>
+      <a class="btn-cta" href="https://brandique.in" target="_blank" rel="noopener">Talk to BrandiQue →</a>
+    </div>
+  </div>
+</footer>
+
+<div class="modal-backdrop" id="claimModal" hidden>
+  <div class="modal">
+    <button class="modal-close" id="modalClose" type="button" aria-label="Close">×</button>
+    <h3>Almost there — your listing details</h3>
+    <p class="modal-rank" id="modalRankInfo"></p>
+    <form id="claimForm">
+      <label>Product name<input id="fName" type="text" required maxlength="60" placeholder="e.g. My Awesome App"></label>
+      <label>Tagline<input id="fTagline" type="text" required maxlength="90" placeholder="One line — what does it do?"></label>
+      <label>Your email (for your listing updates &amp; rank alerts)<input id="fEmail" type="email" required placeholder="you@company.com"></label>
+      <div class="modal-pay" id="payBox">
+        <p><strong>Launch phase:</strong> no payment today. Your bid of <span id="payAmount"></span> reserves your rank. When paid bidding opens, this amount becomes payable to hold the spot.</p>
+      </div>
+      <button class="btn-claim btn-wide" type="submit">Publish my listing →</button>
+      <p class="form-err" id="formErr" hidden></p>
+    </form>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="store.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
